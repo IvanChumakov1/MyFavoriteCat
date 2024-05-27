@@ -1,4 +1,8 @@
 package com.example.domain.Entity
 
-class CatEntity {
-}
+data class CatEntity(
+    val imdbID: String,
+    val Title: String,
+    val Year: String,
+    val Poster: String
+)
