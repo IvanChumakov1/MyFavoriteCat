@@ -1,5 +1,6 @@
 package com.example.data.DataSource.API.Repository
 
+import android.util.Log
 import com.example.data.DataSource.API.Entity.toCatEntity
 import com.example.data.DataSource.API.Service.CatAPIService
 import com.example.domain.Entity.CatEntity
@@ -12,11 +13,10 @@ class CatAPIRepositoryImpl @Inject constructor(private val api: CatAPIService) :
     APICatRepository {
 
     override fun getCats(
-        title: String,
-        year: String?
+        name: String,
     ): List<CatEntity>? {
         return api
-            .getCatList(title = title, year = year)
+            .getCatList(name = name)
             .execute()
             .body()
             ?.Search

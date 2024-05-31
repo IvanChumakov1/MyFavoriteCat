@@ -7,26 +7,20 @@ import com.example.domain.Entity.CatEntity
 @Entity
 data class DBCatEntity(
     @PrimaryKey
-    val imdbID: String,
-    val Title: String,
-    val Year: String,
-    val Poster: String
+    val name: String,
+    val image_link: String
 )
 
 fun DBCatEntity.toCatEntity(): CatEntity {
     return CatEntity(
-        imdbID = imdbID,
-        Title = Title,
-        Year = Year,
-        Poster = Poster
+        name = name,
+        image_link = image_link
     )
 }
 
 fun CatEntity.toDBCatEntity(): DBCatEntity {
     return DBCatEntity(
-        imdbID = imdbID,
-        Title = Title,
-        Year = Year,
-        Poster = Poster
+        name = name,
+        image_link = image_link
     )
 }

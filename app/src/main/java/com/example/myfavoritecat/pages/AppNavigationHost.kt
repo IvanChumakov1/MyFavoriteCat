@@ -24,15 +24,14 @@ fun AppNavigationHost(navController: NavHostController) {
                 onNavigateBack = {
                     navController.navigate(Routes.MY_CATS.route)
                 },
-                onNavigateToObserveSearchCatsPage = { title, year ->
-                    navController.navigate(createObservSearchCatsRoute(title, year))
+                onNavigateToObserveSearchCatsPage = { name ->
+                    navController.navigate(createObservSearchCatsRoute(name))
                 },
                 selectingViewModel = selectedViewModel
             )
         }
         composable(Routes.OBSERVE_SEARCH_CATS.route, arguments = listOf(
-            navArgument("title") { defaultValue = "" },
-            navArgument("year") { defaultValue = "" }
+            navArgument("name") { defaultValue = "" }
         )) {
             ObserveSearchCatsPage(
                 onNavigateBack = {
@@ -40,14 +39,13 @@ fun AppNavigationHost(navController: NavHostController) {
                         Routes.SEARCH_CATS.route,
                     )
                 },
-                title = it.arguments?.getString("title") ?: "",
-                year = it.arguments?.getString("year") ?: "",
+                name = it.arguments?.getString("name") ?: "",
                 selectingViewModel = selectedViewModel
             )
         }
     }
 }
 
-fun createObservSearchCatsRoute(title: String, year: String): String {
-    return "ObserveSearchCatsPage?year=$year&title=$title"
+fun createObservSearchCatsRoute(name: String): String {
+    return "ObserveSearchCatsPage?name=$name"
 }

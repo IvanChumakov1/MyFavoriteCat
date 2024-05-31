@@ -38,22 +38,19 @@ import com.example.myfavoritecat.ViewModels.SelectingCatViewModel
 @Composable
 fun SearchCatsPage(
     onNavigateBack: () -> Unit,
-    onNavigateToObserveSearchCatsPage: (title: String, year: String) -> Unit,
+    onNavigateToObserveSearchCatsPage: (name: String) -> Unit,
     selectingViewModel: SelectingCatViewModel = hiltViewModel(),
     viewModel: SearchCatsViewModel = hiltViewModel()
 ) {
     val selectedCat by selectingViewModel.selectedCat.collectAsState()
 
-    val (title, setTitle) = rememberSaveable {
+    val (name, setTitle) = rememberSaveable {
         mutableStateOf("")
     }
 
-    val (year, setYear) = rememberSaveable {
-        mutableStateOf("")
-    }
 
     fun handleSearch() {
-        onNavigateToObserveSearchCatsPage(title, year)
+        onNavigateToObserveSearchCatsPage(name)
     }
 
     fun handleAdd() {
@@ -90,22 +87,10 @@ fun SearchCatsPage(
             modifier = Modifier.padding(padding),
         ) {
             OutlinedTextField(
-                value = selectedCat?.Title ?: title,
+                value = selectedCat?.name ?: name,
                 onValueChange = setTitle,
                 label = { Text(text = "Cat Title") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = selectedCat !== null
-            )
-
-            OutlinedTextField(
-                value = selectedCat?.Year ?: year,
-                onValueChange = {
-                    if (it.length < 5)
-                        setYear(it)
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = { Text(text = "Cat Year") },
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = selectedCat !== null
             )
@@ -125,15 +110,15 @@ fun SearchCatsPage(
                     Text(text = "Clear")
                 }
 
-                Button(onClick = { handleSearch() }, enabled = title.isNotEmpty()) {
+                Button(onClick = { handleSearch() }, enabled = name.isNotEmpty()) {
                     Text(text = "Search")
                 }
             }
 
             if (selectedCat != null) {
                 AsyncImage(
-                    model = selectedCat!!.Poster,
-                    contentDescription = "Cat ${selectedCat!!.Title}",
+                    model = selectedCat!!.image_link,
+                    contentDescription = "Cat ${selectedCat!!.name}",
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()

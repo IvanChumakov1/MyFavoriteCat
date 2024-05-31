@@ -3,17 +3,13 @@ package com.example.data.DataSource.API.Entity
 import com.example.domain.Entity.CatEntity
 
 data class CatAPIEntity(
-    val Title: String,
-    val Year: String,
-    val Poster: String,
-    val imdbID: String
+    val name: String,
+    val image_link: String,
 )
 
 fun CatAPIEntity.toCatEntity(): CatEntity {
     return CatEntity(
-        imdbID = imdbID,
-        Title = Title,
-        Year = Year,
-        Poster = Poster
+        name = name,
+        image_link = image_link
     )
 }

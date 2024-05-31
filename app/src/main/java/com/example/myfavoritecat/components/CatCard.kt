@@ -32,9 +32,8 @@ fun CatCard(
 ) {
     CatCard(
         onClick = onClick,
-        year = cat.Year,
-        title = cat.Title,
-        imgUrl = cat.Poster,
+        name = cat.name,
+        imgUrl = cat.image_link,
         content = content,
         modifier = modifier
     )
@@ -46,8 +45,7 @@ fun CatCard(
 private fun CatCard(
     modifier: Modifier = Modifier,
     imgUrl: String,
-    title: String,
-    year: String,
+    name: String,
     content: @Composable (() -> Unit) = {},
     onClick: () -> Unit,
 ) {
@@ -68,15 +66,14 @@ private fun CatCard(
         Row {
             AsyncImage(
                 model = imgUrl,
-                contentDescription = "Cat $title",
+                contentDescription = "Cat $name",
                 modifier = Modifier
                     .width(80.dp)
                     .fillMaxHeight(),
                 alignment = Alignment.TopStart
             )
             Column(modifier = Modifier.width(250.dp).padding(horizontal = 8.dp)) {
-                Text(text = title, style = MaterialTheme.typography.headlineSmall)
-                Text(text = year)
+                Text(text = name, style = MaterialTheme.typography.headlineSmall)
             }
 
 

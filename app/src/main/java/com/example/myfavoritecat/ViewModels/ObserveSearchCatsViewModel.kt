@@ -1,5 +1,6 @@
 package com.example.myfavoritecat.ViewModels
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -15,12 +16,15 @@ import javax.inject.Inject
 class ObserveSearchCatsViewModel @Inject constructor(
     private val detCatsAPIUseCase: GetCatsAPIUseCase
 ) : ViewModel() {
+
+    // Ломается тут
     var searchedCats: MutableState<List<CatEntity>?> = mutableStateOf(listOf())
         private set
 
-    fun searchCats(title: String, year: String?) {
+    fun searchCats(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val found = detCatsAPIUseCase.invoke(title, year)
+            Log.d("Hello", detCatsAPIUseCase.invoke(name).toString())
+            val found = detCatsAPIUseCase.invoke(name)
             searchedCats.value = found
         }
     }

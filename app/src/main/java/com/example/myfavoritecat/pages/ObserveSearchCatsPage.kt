@@ -1,5 +1,6 @@
 package com.example.myfavoritecat.pages
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -28,15 +29,14 @@ import com.example.myfavoritecat.components.CatCard
 @Composable
 fun ObserveSearchCatsPage(
     onNavigateBack: () -> Unit,
-    title: String,
-    year: String? = null,
+    name: String,
     viewModal: ObserveSearchCatsViewModel = hiltViewModel(),
     selectingViewModel: SelectingCatViewModel = hiltViewModel()
 ) {
     val cats = remember { viewModal.searchedCats }
 
     LaunchedEffect(true) {
-        viewModal.searchCats(title, year)
+        viewModal.searchCats(name)
     }
 
     Scaffold(
