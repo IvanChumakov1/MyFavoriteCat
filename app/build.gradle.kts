@@ -58,6 +58,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
     //implementation("androidx.compose.runtime:runtime-livedata")
     //implementation("androidx.compose.runtime:runtime-rxjava2")
 

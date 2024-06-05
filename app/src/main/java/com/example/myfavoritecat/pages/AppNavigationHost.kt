@@ -23,11 +23,11 @@ fun AppNavigationHost(navController: NavHostController) {
             SearchCatsPage(
                 onNavigateBack = {
                     navController.navigate(Routes.MY_CATS.route)
-                },
+                }/*,
                 onNavigateToObserveSearchCatsPage = { name ->
                     navController.navigate(createObservSearchCatsRoute(name))
                 },
-                selectingViewModel = selectedViewModel
+                selectingViewModel = selectedViewModel*/
             )
         }
         composable(Routes.OBSERVE_SEARCH_CATS.route, arguments = listOf(

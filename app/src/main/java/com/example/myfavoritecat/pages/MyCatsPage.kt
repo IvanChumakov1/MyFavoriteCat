@@ -28,9 +28,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.domain.Entity.CatEntity
+import com.example.myfavoritecat.R
 import com.example.myfavoritecat.ViewModels.MyCatsViewModel
 import com.example.myfavoritecat.components.CatCard
 import com.example.myfavoritecat.components.IconWithText
@@ -65,7 +68,6 @@ fun MyCatsPage(
         selectedCats.forEach { viewModel.removeCat(it) }
         selectedCats.clear()
     }
-
 
     Scaffold(
         floatingActionButton = {
@@ -103,8 +105,7 @@ fun MyCatsPage(
                 contentAlignment = Alignment.Center
             ) {
                 IconWithText(
-                    //////////////////////////////////////////////////////////////////
-                    imageVector = Icons.Filled.Warning,
+                    imageVector = ImageVector.vectorResource(R.drawable.black_cat_icon_177458),
                     text = "There are currently no cats in your watch list. Tap the button below to get started!"
                 )
             }
