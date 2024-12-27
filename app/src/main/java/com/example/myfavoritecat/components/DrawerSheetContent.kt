@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Menu
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrawerSheetContent(
+    onAddCat: () -> Unit,
     onSelectAll: () -> Unit,
     onDelete: () -> Unit,
     onSortAZ: () -> Unit,
@@ -44,10 +46,10 @@ fun DrawerSheetContent(
                 label = { Text("Добавить свою породу") },
                 selected = false,
                 onClick = {
-                    // TODO: Implement adding custom breed
+                    onAddCat()
                     scope.launch { drawerState.close() }
                 },
-                icon = { Icon(Icons.Filled.Menu, contentDescription = "Add") },
+                icon = { Icon(Icons.Filled.Add, contentDescription = "Add") },
                 modifier = Modifier.padding(top = 8.dp)
             )
             NavigationDrawerItem(

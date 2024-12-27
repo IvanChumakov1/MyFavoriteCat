@@ -7,4 +7,5 @@ interface DBCatRepository {
     val allCats: Flow<List<CatEntity>>
     suspend fun insert(cat: CatEntity)
     suspend fun delete(cat: CatEntity)
+    suspend fun update(cat: CatEntity)
 }

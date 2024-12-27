@@ -18,12 +18,15 @@ class DBCatRepositoryImpl @Inject constructor(private val catDao: CatDao) :
     override val allCats: Flow<List<CatEntity>> =
         catDao.getAllCats().map { cat -> cat.map { it.toCatEntity() } }
 
-
     override suspend fun insert(cat: CatEntity) {
         catDao.insert(cat.toDBCatEntity())
     }
 
     override suspend fun delete(cat: CatEntity) {
         catDao.delete(cat.toDBCatEntity())
+    }
+
+    override suspend fun update(cat: CatEntity) {
+        catDao.update(cat.toDBCatEntity())
     }
 }

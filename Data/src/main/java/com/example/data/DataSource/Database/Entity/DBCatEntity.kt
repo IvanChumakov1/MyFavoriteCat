@@ -7,6 +7,7 @@ import com.example.domain.Entity.CatEntity
 @Entity
 data class DBCatEntity(
     @PrimaryKey
+    val id: String,
     val name: String,
     val image_link: String,
     val length: String,
@@ -21,14 +22,13 @@ data class DBCatEntity(
     val grooming: String,
     val intelligence: String,
     val other_pets_friendly: String,
-    val min_weight: String,
     val max_weight: String,
-    val min_life_expectancy: String,
     val life_expectancy: String
 )
 
 fun DBCatEntity.toCatEntity(): CatEntity {
     return CatEntity(
+        id = id,
         name = name,
         image_link = image_link,
         length = length,
@@ -50,6 +50,7 @@ fun DBCatEntity.toCatEntity(): CatEntity {
 
 fun CatEntity.toDBCatEntity(): DBCatEntity {
     return DBCatEntity(
+        id = id,
         name = name,
         image_link = image_link,
         length = length,
@@ -64,9 +65,7 @@ fun CatEntity.toDBCatEntity(): DBCatEntity {
         grooming = grooming,
         intelligence = intelligence,
         other_pets_friendly = other_pets_friendly,
-        min_weight = "",
         max_weight = max_weight,
-        min_life_expectancy = "",
         life_expectancy = life_expectancy
     )
 }

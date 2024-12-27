@@ -18,6 +18,8 @@ fun AppNavigationHost(navController: NavHostController) {
                 navController.navigate(
                     Routes.SEARCH_CATS.route
                 )
+            }, onNavigationToEditCatPage = {catId ->
+                navController.navigate(createEditCatRoute(catId))
             })
         }
         composable(Routes.SEARCH_CATS.route) {
@@ -52,9 +54,27 @@ fun AppNavigationHost(navController: NavHostController) {
                 )
             }
         }
+        composable(
+            route = Routes.EDIT_CAT.route,
+            arguments = listOf(navArgument("catId") { defaultValue = "" })
+        ) { backStackEntry ->
+            val catId = backStackEntry.arguments?.getString("catId")
+            EditCatPage(
+                catId = catId,
+                onNavigateBack = {
+                    navController.navigate(Routes.MY_CATS.route) {
+                        popUpTo(0)
+                    }
+                }
+            )
+        }
     }
 }
 
 fun createObserveCatRoute(catId: String): String {
     return "ObserveCatPage/$catId"
+}
+
+fun createEditCatRoute(catId: String?): String {
+    return "EditCatPage/$catId"
 }

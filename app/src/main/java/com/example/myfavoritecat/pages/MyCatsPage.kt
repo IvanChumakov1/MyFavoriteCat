@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyCatsPage(
     onNavigationToSearchCatsPage: () -> Unit,
+    onNavigationToEditCatPage: (String) -> Unit,
     viewModel: MyCatsViewModel = hiltViewModel()
 ) {
     val cats = viewModel.cats.collectAsState(initial = emptyList())
@@ -106,6 +107,9 @@ fun MyCatsPage(
         drawerState = drawerState,
         drawerContent = {
             DrawerSheetContent(
+                onAddCat = {
+                    onNavigationToEditCatPage("")
+                },
                 onSelectAll = { handleSelectAll() },
                 onDelete = { handleDelete() },
                 onSortAZ = {handleSortAZ()},
@@ -126,7 +130,7 @@ fun MyCatsPage(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary
                     ),
-                    navigationIcon = {
+                    actions = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
@@ -164,7 +168,7 @@ fun MyCatsPage(
                     items(cats.value) { cat -> // Используем items(List)
                         CatCard(
                             cat = cat,
-                            onClick = { toggleSelect(cat) },
+                            onClick = { onNavigationToEditCatPage(cat.id) },
                         ) {
                             Checkbox(
                                 checked = isSelected(cat),
