@@ -113,33 +113,34 @@ fun SearchCatsPage(
                 },
                 label = { Text(text = "Cat Title") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(5.dp),
             )
 
             Row(
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(onClick = { handleSearch() }, enabled = searchQuery.value.isNotEmpty()) {
+                Button(onClick = { handleSearch() }, enabled = searchQuery.value.isNotEmpty(), modifier = Modifier.fillMaxWidth().padding(5.dp)) {
                     Text(text = "Search")
                 }
             }
             if (isResult) {
                 if (cats.value != null) {
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        columns = GridCells.Fixed(1),
+                        verticalArrangement = Arrangement.spacedBy(5.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
                         modifier = Modifier
-                            .padding(padding)
+                            .padding(5.dp)
                     ) {
                         items(cats.value!!) { cat ->
                             CatCard(
                                 cat = cat,
                                 onClick = {
                                     onNavigateToObserveCatPage(cat)
-                                },
-                            )
+                                }
+                            ) {
+                            }
                         }
                     }
                 }
@@ -147,5 +148,4 @@ fun SearchCatsPage(
         }
     }
 }
-
 

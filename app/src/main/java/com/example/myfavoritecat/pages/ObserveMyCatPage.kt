@@ -21,9 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,20 +31,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.domain.Entity.CatEntity
-import com.example.myfavoritecat.ViewModels.ObserveCatViewModel
+import com.example.myfavoritecat.ViewModels.MyCatsViewModel
 import com.example.myfavoritecat.ViewModels.ObserveSearchCatsViewModel
 import com.example.myfavoritecat.ViewModels.SearchCatsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ObserveCatPage(
+fun ObserveMyCatPage(
     cat: CatEntity,
     onNavigateBack: () -> Unit,
-    onAddCat: () -> Unit,
-    viewModel: SearchCatsViewModel = hiltViewModel(),
-    observeSearchCatsViewModel: ObserveSearchCatsViewModel = hiltViewModel()
+    viewModel: MyCatsViewModel = hiltViewModel()
 ) {
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -82,7 +77,7 @@ fun ObserveCatPage(
                 fontWeight = FontWeight.Bold
             )
 
-            // Характеристики
+            // Характерис��ики
             CatCharacteristic("Length", cat.length)
             CatCharacteristic("Origin", cat.origin)
             CatCharacteristic("Family Friendly", cat.family_friendly)
@@ -108,33 +103,6 @@ fun ObserveCatPage(
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop
             )
-
-            // Кнопка добавления
-            Button(
-                onClick = {
-                    viewModel.addCat(cat)
-                    onAddCat()
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth()
-            ) {
-                Text("Add a breed")
-            }
-        }
-    }
-}
-
-@Composable
-fun CatCharacteristic(label: String, value: String?) {
-    if (value != null) {
-        if (value.isNotEmpty()){
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "$label: ",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.width(180.dp)
-                )
-                Text(text = value)
-            }
         }
     }
 }

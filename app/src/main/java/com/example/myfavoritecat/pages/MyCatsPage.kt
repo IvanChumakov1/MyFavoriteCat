@@ -3,6 +3,7 @@ package com.example.myfavoritecat.pages
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Checkbox
@@ -58,6 +60,7 @@ import kotlinx.coroutines.launch
 fun MyCatsPage(
     onNavigationToSearchCatsPage: () -> Unit,
     onNavigationToEditCatPage: (String) -> Unit,
+    onNavigationToObserveMyCatPage: (String) -> Unit,
     viewModel: MyCatsViewModel = hiltViewModel()
 ) {
     val cats = viewModel.cats.collectAsState(initial = emptyList())
@@ -131,6 +134,15 @@ fun MyCatsPage(
                         titleContentColor = MaterialTheme.colorScheme.primary
                     ),
                     actions = {
+                        IconButton(onClick = { scope.launch { handleDelete() } }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
@@ -160,19 +172,30 @@ fun MyCatsPage(
                 }
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2), // 2 столбца
+                    columns = GridCells.Fixed(1), // 2 столбца
                     modifier = Modifier.padding(padding),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp) // Отступы между элементами
                 ) {
-                    items(cats.value) { cat -> // Используем items(List)
+                    items(cats.value) { cat ->
                         CatCard(
                             cat = cat,
-                            onClick = { onNavigationToEditCatPage(cat.id) },
+                            onClick = { onNavigationToObserveMyCatPage(cat.id) }
                         ) {
-                            Checkbox(
-                                checked = isSelected(cat),
-                                onCheckedChange = { toggleSelect(cat) })
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IconButton(onClick = { onNavigationToEditCatPage(cat.id) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Edit",
+                                    )
+                                }
+                                Checkbox(
+                                    checked = isSelected(cat),
+                                    onCheckedChange = { toggleSelect(cat) }
+                                )
+                            }
                         }
                     }
                 }

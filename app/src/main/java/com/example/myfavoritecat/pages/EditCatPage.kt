@@ -1,9 +1,15 @@
 package com.example.myfavoritecat.pages
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,11 +32,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.domain.Entity.CatEntity
+import com.example.myfavoritecat.R
 import com.example.myfavoritecat.ViewModels.MyCatsViewModel
 import com.example.myfavoritecat.ViewModels.ObserveSearchCatsViewModel
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Objects
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,13 +60,12 @@ fun EditCatPage(
     observeSearchCatsViewModel: ObserveSearchCatsViewModel = hiltViewModel()
 ) {
     val cat = if (!catId.isNullOrEmpty()) {
-        observeSearchCatsViewModel.getCatById(catId)
+        myCatsViewModel.getCatById(catId)
     } else {
         null
     }
 
     var name by remember { mutableStateOf(cat?.name ?: "") }
-    var imageLink by remember { mutableStateOf(cat?.image_link ?: "") }
     var length by remember { mutableStateOf(cat?.length ?: "") }
     var origin by remember { mutableStateOf(cat?.origin ?: "") }
     var familyFriendly by remember { mutableStateOf(cat?.family_friendly ?: "") }
@@ -68,7 +85,7 @@ fun EditCatPage(
         val updatedCat = CatEntity(
             id = cat?.id ?: "",
             name = name,
-            image_link = imageLink,
+            image_link = cat?.image_link ?: "",
             length = length,
             origin = origin,
             family_friendly = familyFriendly,
@@ -128,12 +145,27 @@ fun EditCatPage(
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
-                value = imageLink,
-                onValueChange = { imageLink = it },
-                label = { Text("Image Link") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (!cat?.image_link.isNullOrEmpty()) {
+                AsyncImage(
+                    model = cat?.image_link,
+                    contentDescription = "Cat Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(MaterialTheme.shapes.medium),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.black_cat_icon_177458),
+                    contentDescription = "Default Cat Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(MaterialTheme.shapes.medium),
+                    contentScale = ContentScale.Crop
+                )
+            }
             OutlinedTextField(
                 value = length,
                 onValueChange = { length = it },
@@ -221,7 +253,7 @@ fun EditCatPage(
 
             Button(
                 onClick = { handleSave() },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth()
             ) {
                 Text(if (!catId.isNullOrEmpty()) "Save Changes" else "Add Cat")
             }

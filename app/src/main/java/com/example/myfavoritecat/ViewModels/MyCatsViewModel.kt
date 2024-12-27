@@ -61,4 +61,8 @@ class MyCatsViewModel @Inject constructor(
             updateCatDBUseCase.invoke(cat)
         }
     }
+    // Изменено
+    fun getCatById(catId: String?): CatEntity? {
+        return _cats.value.find { it.id == catId }
+    }
 }
