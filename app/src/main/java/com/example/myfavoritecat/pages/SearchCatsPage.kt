@@ -1,16 +1,26 @@
 package com.example.myfavoritecat.pages
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,50 +28,57 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.domain.Entity.CatEntity
+import com.example.myfavoritecat.ViewModels.ObserveSearchCatsViewModel
 import com.example.myfavoritecat.ViewModels.SearchCatsViewModel
-import com.example.myfavoritecat.ViewModels.SelectingCatViewModel
+import com.example.myfavoritecat.components.CatCard
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchCatsPage(
     onNavigateBack: () -> Unit,
-    onNavigateToObserveSearchCatsPage: (title: String, year: String) -> Unit,
-    selectingViewModel: SelectingCatViewModel = hiltViewModel(),
-    viewModel: SearchCatsViewModel = hiltViewModel()
+    onNavigateToObserveCatPage: (cat: CatEntity) -> Unit,
+    observeSearchCatsViewModel: ObserveSearchCatsViewModel = hiltViewModel()
 ) {
-    val selectedCat by selectingViewModel.selectedCat.collectAsState()
+    val cats = observeSearchCatsViewModel.searchedCats
+    val searchQuery = observeSearchCatsViewModel.searchQuery
+    var isResult by remember { mutableStateOf(false) }
 
-    val (title, setTitle) = rememberSaveable {
-        mutableStateOf("")
-    }
-
-    val (year, setYear) = rememberSaveable {
-        mutableStateOf("")
+    LaunchedEffect(key1 = searchQuery.value) {
+        if (searchQuery.value.isNotEmpty()) {
+            isResult = true
+            observeSearchCatsViewModel.searchCats(searchQuery.value)
+        }
     }
 
     fun handleSearch() {
-        onNavigateToObserveSearchCatsPage(title, year)
-    }
-
-    fun handleAdd() {
-        if (selectedCat !== null) {
-            viewModel.addCat(selectedCat!!)
-            selectingViewModel.clear()
-            onNavigateBack()
-        }
+        isResult = true
+        observeSearchCatsViewModel.searchCats(searchQuery.value)
     }
 
     Scaffold(
@@ -90,58 +107,45 @@ fun SearchCatsPage(
             modifier = Modifier.padding(padding),
         ) {
             OutlinedTextField(
-                value = selectedCat?.Title ?: title,
-                onValueChange = setTitle,
+                value = searchQuery.value,
+                onValueChange = {
+                    observeSearchCatsViewModel.searchCats(it)
+                },
                 label = { Text(text = "Cat Title") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = selectedCat !== null
-            )
-
-            OutlinedTextField(
-                value = selectedCat?.Year ?: year,
-                onValueChange = {
-                    if (it.length < 5)
-                        setYear(it)
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = { Text(text = "Cat Year") },
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = selectedCat !== null
             )
 
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(
-                    onClick = { handleAdd() },
-                    enabled = selectedCat !== null
-                ) {
-                    Text(text = "Add")
-                }
-
-                Button(onClick = { selectingViewModel.clear() }, enabled = selectedCat !== null) {
-                    Text(text = "Clear")
-                }
-
-                Button(onClick = { handleSearch() }, enabled = title.isNotEmpty()) {
+                Button(onClick = { handleSearch() }, enabled = searchQuery.value.isNotEmpty()) {
                     Text(text = "Search")
                 }
             }
-
-            if (selectedCat != null) {
-                AsyncImage(
-                    model = selectedCat!!.Poster,
-                    contentDescription = "Cat ${selectedCat!!.Title}",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(vertical = 16.dp),
-                    alignment = Alignment.Center
-                )
+            if (isResult) {
+                if (cats.value != null) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .padding(padding)
+                    ) {
+                        items(cats.value!!) { cat ->
+                            CatCard(
+                                cat = cat,
+                                onClick = {
+                                    onNavigateToObserveCatPage(cat)
+                                },
+                            )
+                        }
+                    }
+                }
             }
         }
     }
-
 }
+
+

@@ -1,20 +1,19 @@
 package com.example.data.DataSource.API.Service
 
-import com.example.data.DataSource.API.Entity.SearchResponseAPIEntity
+import com.example.data.DataSource.API.Entity.CatAPIEntity
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-const val API_KEY = "6266644e"
+const val API_KEY = "fkm6S0TW3x9BCB1TfNJQCQ==OaccOgZyOVLEB3en"
 interface CatAPIService {
-    @GET("/")
+    @GET("/v1/cats/")
     fun getCatList(
-        @Query("s") title: String,
-        @Query("y") year: String?,
-        @Query("apikey") key: String? = API_KEY,
-    ): Call<SearchResponseAPIEntity>
+        @Query("name") name: String, // Добавлен параметр name для поиска по имени
+        @Query("X-Api-Key") key: String = API_KEY,
+    ): Call<List<CatAPIEntity>>
 
     companion object {
-        const val BASE_URL: String = "https://www.omdbapi.com/"
+        const val BASE_URL: String = "https://api.api-ninjas.com"
     }
 }

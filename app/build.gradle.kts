@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.myfavoritecat"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.myfavoritecat"
@@ -57,6 +57,9 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     //implementation("androidx.compose.runtime:runtime-livedata")
     //implementation("androidx.compose.runtime:runtime-rxjava2")
