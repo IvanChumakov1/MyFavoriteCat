@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -43,10 +46,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.myfavoritecat.CatApi.ApiCats
-import com.example.myfavoritecat.CatApi.ApiCatsService
+import com.example.domain.Entity.CatEntity
+import com.example.myfavoritecat.ViewModels.ObserveSearchCatsViewModel
 import com.example.myfavoritecat.ViewModels.SearchCatsViewModel
-import com.example.myfavoritecat.ViewModels.SelectingCatViewModel
+import com.example.myfavoritecat.components.CatCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,123 +61,24 @@ import retrofit2.converter.gson.GsonConverterFactory
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchCatsPage(
-    onNavigateBack: () -> Unit
-){
-
-
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.api-ninjas.com/v1/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val catApiService = retrofit.create(ApiCatsService::class.java)
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
-                ),
-                title = {
-                    Text("Add Cat")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { onNavigateBack() }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                },
-            )
-        },
-
-    ) {padding ->
-        var name by remember { mutableStateOf("") }
-        var cats by remember { mutableStateOf(listOf<ApiCats>()) }
-
-        Column(
-            Modifier.fillMaxWidth().padding(padding)
-        ) {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Введите имя кота")
-                }
-            )
-            Button(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                onClick = {
-                    // Вызовите API и обновите список котов
-                    CoroutineScope(Dispatchers.IO).launch {
-                        cats = catApiService.getCatsByName(name)
-                    }
-
-                }) {
-                Text("Поиск")
-            }
-            CatLazyRow(cats)
-        }
-    }
-}
-
-@Composable
-fun CatLazyRow(cats: List<ApiCats>) {
-    LazyColumn {
-        items(cats) { cat ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(all = 8.dp)
-            ) {
-                Column {
-                    AsyncImage(
-                        model = cat.image_link,
-                        contentDescription = "Cat ${cat.name}",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            ,
-                        alignment = Alignment.Center,
-
-                    )
-                    Text(text = cat.name, Modifier.padding(8.dp))
-                }
-            }
-        }
-    }
-}
-
-
-
-/*
-fun SearchCatsPage(
     onNavigateBack: () -> Unit,
-    onNavigateToObserveSearchCatsPage: (name: String) -> Unit,
-    selectingViewModel: SelectingCatViewModel = hiltViewModel(),
-    viewModel: SearchCatsViewModel = hiltViewModel()
+    onNavigateToObserveCatPage: (cat: CatEntity) -> Unit,
+    observeSearchCatsViewModel: ObserveSearchCatsViewModel = hiltViewModel()
 ) {
-    val selectedCat by selectingViewModel.selectedCat.collectAsState()
+    val cats = observeSearchCatsViewModel.searchedCats
+    val searchQuery = observeSearchCatsViewModel.searchQuery
+    var isResult by remember { mutableStateOf(false) }
 
-    val (name, setTitle) = rememberSaveable {
-        mutableStateOf("")
+    LaunchedEffect(key1 = searchQuery.value) {
+        if (searchQuery.value.isNotEmpty()) {
+            isResult = true
+            observeSearchCatsViewModel.searchCats(searchQuery.value)
+        }
     }
-
 
     fun handleSearch() {
-        onNavigateToObserveSearchCatsPage(name)
-    }
-
-    fun handleAdd() {
-        if (selectedCat !== null) {
-            viewModel.addCat(selectedCat!!)
-            selectingViewModel.clear()
-            onNavigateBack()
-        }
+        isResult = true
+        observeSearchCatsViewModel.searchCats(searchQuery.value)
     }
 
     Scaffold(
@@ -203,44 +107,45 @@ fun SearchCatsPage(
             modifier = Modifier.padding(padding),
         ) {
             OutlinedTextField(
-                value = selectedCat?.name ?: name,
-                onValueChange = setTitle,
+                value = searchQuery.value,
+                onValueChange = {
+                    observeSearchCatsViewModel.searchCats(it)
+                },
                 label = { Text(text = "Cat Title") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = selectedCat !== null
             )
 
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(
-                    onClick = { handleAdd() },
-                    enabled = selectedCat !== null
-                ) {
-                    Text(text = "Add")
-                }
-
-                Button(onClick = { selectingViewModel.clear() }, enabled = selectedCat !== null) {
-                    Text(text = "Clear")
-                }
-
-                Button(onClick = { handleSearch() }, enabled = name.isNotEmpty()) {
+                Button(onClick = { handleSearch() }, enabled = searchQuery.value.isNotEmpty()) {
                     Text(text = "Search")
                 }
             }
-
-            if (selectedCat != null) {
-                AsyncImage(
-                    model = selectedCat!!.image_link,
-                    contentDescription = "Cat ${selectedCat!!.name}",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(vertical = 16.dp),
-                    alignment = Alignment.Center
-                )
+            if (isResult) {
+                if (cats.value != null) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .padding(padding)
+                    ) {
+                        items(cats.value!!) { cat ->
+                            CatCard(
+                                cat = cat,
+                                onClick = {
+                                    onNavigateToObserveCatPage(cat)
+                                },
+                            )
+                        }
+                    }
+                }
             }
         }
-    }*/
+    }
+}
+
+

@@ -16,11 +16,9 @@ class CatAPIRepositoryImpl @Inject constructor(private val api: CatAPIService) :
         name: String,
     ): List<CatEntity>? {
         return api
-            .getCatList(name = name)
+            .getCatList(name = name) // Передаем name в запрос
             .execute()
             .body()
-            ?.Search
-            ?.toList()
             ?.map { it.toCatEntity() }
     }
 }
